@@ -20,6 +20,38 @@ def request(url):
   response.raise_for_status()
   return response
 
+def request_put(url):
+  request_headers = {'User-Agent': 'jeffkaufman/nomic'}
+  response = requests.put(url, headers=request_headers)
+
+  for header in ['X-RateLimit-Limit',
+                 'X-RateLimit-Remaining',
+                 'X-RateLimit-Reset']:
+    if header in response.headers:
+      print('    > %s: %s' % (header, response.headers[header]))
+
+  if response.status_code != 201:
+    print('   > %s' % response.content)
+
+  response.raise_for_status()
+  return response
+
+def request_delete(url):
+  request_headers = {'User-Agent': 'jeffkaufman/nomic'}
+  response = requests.delete(url, headers=request_headers)
+
+  for header in ['X-RateLimit-Limit',
+                 'X-RateLimit-Remaining',
+                 'X-RateLimit-Reset']:
+    if header in response.headers:
+      print('    > %s: %s' % (header, response.headers[header]))
+
+  if response.status_code != 204:
+    print('   > %s' % response.content)
+
+  response.raise_for_status()
+  return response
+
 def iso8601_to_ts(iso8601):
   return int(time.mktime(time.strptime(iso8601, "%Y-%m-%dT%H:%M:%SZ")))
 
