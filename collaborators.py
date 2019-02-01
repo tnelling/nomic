@@ -4,8 +4,9 @@ import util
 from typing import List
 from util import HttpVerb
 
-def update(repo: str, users: List[str]):
+def update(repo: str):
   collaborators = [c['login'] for c in util.request(_collaborators_url(repo)).json()]
+  users = util.users()
   _remove_non_players(repo, users, collaborators)
   _add_new_players(repo, users, collaborators)
 
