@@ -3,10 +3,30 @@ import re
 import requests
 import subprocess
 import time
+from enum import Enum
 
-def request(url):
+class HttpVerb(Enum):
+  get = 1
+  put = 2
+  delete = 3
+
+def _request_by_verb():
+  return {
+    HttpVerb.get: requests.get,
+    HttpVerb.put: requests.put,
+    HttpVerb.delete: requests.delete
+  }
+
+def _ok_codes_by_verb():
+  return {
+    HttpVerb.get: [200],
+    HttpVerb.put: [201],
+    HttpVerb.delete: [204]
+  }
+
+def request(url, verb=HttpVerb.get):
   request_headers = {'User-Agent': 'jeffkaufman/nomic'}
-  response = requests.get(url, headers=request_headers)
+  response = _request_by_verb().get(verb)(url, headers=request_headers)
 
   for header in ['X-RateLimit-Limit',
                  'X-RateLimit-Remaining',
@@ -14,39 +34,7 @@ def request(url):
     if header in response.headers:
       print('    > %s: %s' % (header, response.headers[header]))
 
-  if response.status_code != 200:
-    print('   > %s' % response.content)
-
-  response.raise_for_status()
-  return response
-
-def request_put(url):
-  request_headers = {'User-Agent': 'jeffkaufman/nomic'}
-  response = requests.put(url, headers=request_headers)
-
-  for header in ['X-RateLimit-Limit',
-                 'X-RateLimit-Remaining',
-                 'X-RateLimit-Reset']:
-    if header in response.headers:
-      print('    > %s: %s' % (header, response.headers[header]))
-
-  if response.status_code != 201:
-    print('   > %s' % response.content)
-
-  response.raise_for_status()
-  return response
-
-def request_delete(url):
-  request_headers = {'User-Agent': 'jeffkaufman/nomic'}
-  response = requests.delete(url, headers=request_headers)
-
-  for header in ['X-RateLimit-Limit',
-                 'X-RateLimit-Remaining',
-                 'X-RateLimit-Reset']:
-    if header in response.headers:
-      print('    > %s: %s' % (header, response.headers[header]))
-
-  if response.status_code != 204:
+  if response.status_code not in _ok_codes_by_verb().get(verb):
     print('   > %s' % response.content)
 
   response.raise_for_status()
