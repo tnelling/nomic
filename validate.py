@@ -1,7 +1,7 @@
 import os
-import random
 import runpy
 import copy
+import traceback
 
 import util
 import pull_request
@@ -68,7 +68,7 @@ def determine_if_mergeable(pr):
 
   # Go through rules sorted by priority, with ties broken by the filename.
   for rule_priority, rule_full_fname, rule_name, is_allow in sorted(rules):
-    print('Running rule %s' % rule_full_fname)
+    print('\nRunning rule %s' % rule_full_fname)
 
     pr_copy = copy.deepcopy(pr)
 
@@ -83,6 +83,7 @@ def determine_if_mergeable(pr):
           print('\nPASS: %s' % rule_name)
           return
       except Exception as e:
+        traceback.print_exc()
         print('  %s: %s' % (rule_full_fname, e))
     else:
       # Raises an exception to indicate blocking, anything else for no
@@ -97,15 +98,15 @@ def determine_if_winner():
   # Pick a winner at random with a single random number.  We divide the number
   # line up like:
   #
-  # [ a_points | b_points | c_points | ... everything else ... ]
+  #   [ a_points | b_points | c_points | ... everything else ... ]
   #
   # and then we choose a place on the number line randomly:
   #
-  # [ a_points | b_points | c_points | ... everything else ... ]
+  #   [ a_points | b_points | c_points | ... everything else ... ]
   #                          ^
-  #
   # or:
-  # [ a_points | b_points | c_points | ... everything else ... ]
+  #
+  #   [ a_points | b_points | c_points | ... everything else ... ]
   #                                       ^
   # You can think of this as assigning a range to each player:
   #
@@ -114,7 +115,7 @@ def determine_if_winner():
   #   C wins if random is [a_points + b_points, a_points + b_points + c_points)
   #   no one wins if random is [a_points + b_points + c_points, 1)
 
-  rnd = random.random()
+  rnd = util.random()
   points_so_far = 0
   for user, user_points in util.get_user_points().items():
     if rnd < 0.00001 * (user_points + points_so_far):
