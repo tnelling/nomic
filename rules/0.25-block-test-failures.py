@@ -1,9 +1,14 @@
 import os
 import runpy
-import util
-import pull_request
 
 SIMPLE_TESTS = {
+  '0.16-allow-player-departure.py': [
+    ('225', 'All file changes must be deletions'),
+    ('248', 'Removed file run.sh cannot be parsed to a player file path'),
+    ('247', 'Removed file stubs/unidiff/__init__.pyi is not a player file'),
+    ('69', 'jeffkaufman cannot remove TheJhyde without approval'),
+    ('246', None),
+  ],
   '0.3-allow-points-transfer.py': [
     ('33', 'All file changes must be additions'),
     ('82', 'Points transfer PRs should not add users: got dchudz'),
